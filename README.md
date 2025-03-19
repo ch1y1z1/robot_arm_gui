@@ -27,8 +27,7 @@ $$ Y = ((L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3}
 
 $$ Z = L_1 + L_2 \sin(\alpha_{A2}) + L_3 \sin(\alpha_{A2} + \alpha_{A3}) $$
 
-其中，$L_5$ 为杆长修正长度，$\alpha_{A1,start}$ , $\alpha_{A2,start}$, $\alpha_{A3,start}$为各关节的起始角度偏移。
-
+其中， $L_5$ 为杆长修正长度， $\alpha_{A1,start}$ ， $\alpha_{A2,start}$ ， $\alpha_{A3,start}$为各关节的起始角度偏移。
 
 
 # 机械臂逆运动学方程推导
@@ -39,6 +38,7 @@ $$ Z = L_1 + L_2 \sin(\alpha_{A2}) + L_3 \sin(\alpha_{A2} + \alpha_{A3}) $$
 
 ### 步骤1: 求解 $\alpha_{A1}$
 从正向运动学方程中可以看出， $X$ 和 $Y$ 坐标与 $\alpha_{A1}$ 的关系为：
+
 $$ X = r \cdot \cos(\alpha_{A1}) $$
 
 $$ Y = r \cdot \sin(\alpha_{A1}) $$
@@ -46,10 +46,12 @@ $$ Y = r \cdot \sin(\alpha_{A1}) $$
 其中 $r = (L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3})$
 
 因此：
+
 $$ \alpha_{A1} = \text{atan2}(Y, X) $$
 
 ### 步骤2: 计算辅助变量
 定义辅助变量：
+
 $$ r = \sqrt{X^2 + Y^2} $$
 
 $$ \rho = r - (L_5 + L_4) $$
@@ -58,12 +60,15 @@ $$ \zeta = Z - L_1 $$
 
 ### 步骤3: 求解 $\alpha_{A3}$
 使用余弦定律：
+
 $$ \rho^2 + \zeta^2 = L_2^2 + L_3^2 + 2L_2L_3\cos(\alpha_{A3}) $$
 
 整理得：
+
 $$ \cos(\alpha_{A3}) = \frac{\rho^2 + \zeta^2 - L_2^2 - L_3^2}{2L_2L_3} $$
 
 定义 $D = \frac{\rho^2 + \zeta^2 - L_2^2 - L_3^2}{2L_2L_3}$ ，则：
+
 $$ \alpha_{A3} = \text{atan2}(\pm\sqrt{1-D^2}, D) $$
 
 其中符号取决于机械臂的构型（肘上或肘下）。
@@ -124,7 +129,7 @@ $$ \Delta \mathbf{\Theta} = \mathbf{J}^{-1} \cdot \Delta \mathbf{X} $$
 
 ### $\theta_1$ 的求解
 
-根据正向运动学方程，$\theta_1$ 可直接求解：
+根据正向运动学方程， $\theta_1$ 可直接求解：
 
 $$ \theta_1 = \alpha_{A1} - \alpha_{A1,\text{start}} = \text{atan2}(y, x) - \alpha_{A1,\text{start}} $$
 
@@ -150,7 +155,7 @@ $$ J_{21} = \frac{\partial z}{\partial \theta_2} = L_2 \cos(\alpha_{A2}) + L_3 \
 
 $$ J_{22} = \frac{\partial z}{\partial \theta_3} = L_3 \cos(\alpha_{A2} + \alpha_{A3}) \cdot \frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_3} $$
 
-考虑到 $\frac{\partial \alpha_{A2}}{\partial \theta_2} = 1$，$\frac{\partial \alpha_{A3}}{\partial \theta_2} = -1$ ， $\frac{\partial \alpha_{A3}}{\partial \theta_3} = 1$ ，
+考虑到 $\frac{\partial \alpha_{A2}}{\partial \theta_2} = 1$ ， $\frac{\partial \alpha_{A3}}{\partial \theta_2} = -1$ ， $\frac{\partial \alpha_{A3}}{\partial \theta_3} = 1$ ，
 以及 $\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_2} = 0$ ， $\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_3} = 1$ ，
 
 简化后得到：
@@ -271,12 +276,15 @@ L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
    ```
 
 4. **阻尼最小二乘法**：为进一步提高稳定性，可以考虑使用阻尼最小二乘法（Damped Least Squares）：
+   
    $$ \Delta \mathbf{\Theta} = \mathbf{J}^T(\mathbf{J}\mathbf{J}^T + \lambda \mathbf{I})^{-1}\Delta \mathbf{X} $$
+
    其中 $\lambda$ 为阻尼因子， $\mathbf{I}$ 为单位矩阵。
 
 ## 优化策略
 
 1. **变步长策略**：根据误差大小动态调整学习率
+   
    $$ \eta = \eta_0 \cdot \min(1, \frac{\epsilon_{\max}}{||\Delta \mathbf{X}||}) $$
 
 2. **牛顿-拉夫森法**：在雅可比迭代的基础上引入二阶导数信息，可以加速收敛
