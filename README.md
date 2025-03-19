@@ -74,10 +74,12 @@ $$ \alpha_{A3} = \text{atan2}(\pm\sqrt{1-D^2}, D) $$
 其中符号取决于机械臂的构型（肘上或肘下）。
 
 ### 步骤4: 求解 $\alpha_{A2}$
+
 $$ \alpha_{A2} = \text{atan2}(\zeta, \rho) - \text{atan2}(L_3\sin(\alpha_{A3}), L_2 + L_3\cos(\alpha_{A3})) $$
 
 ### 步骤5: 计算关节角度
 根据关节角度和关节坐标的关系，最终求得：
+
 $$ \theta_{A1} = \alpha_{A1} - \alpha_{A1,\text{start}} $$
 
 $$ \theta_{A2} = \alpha_{A2} - \alpha_{A2,\text{start}} $$
@@ -277,7 +279,7 @@ L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
 
 4. **阻尼最小二乘法**：为进一步提高稳定性，可以考虑使用阻尼最小二乘法（Damped Least Squares）：
    
-   $$ \Delta \mathbf{\Theta} = \mathbf{J}^T(\mathbf{J}\mathbf{J}^T + \lambda \mathbf{I})^{-1}\Delta \mathbf{X} $$
+$$ \Delta \mathbf{\Theta} = \mathbf{J}^T(\mathbf{J}\mathbf{J}^T + \lambda \mathbf{I})^{-1}\Delta \mathbf{X} $$
 
    其中 $\lambda$ 为阻尼因子， $\mathbf{I}$ 为单位矩阵。
 
@@ -285,7 +287,7 @@ L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
 
 1. **变步长策略**：根据误差大小动态调整学习率
    
-   $$ \eta = \eta_0 \cdot \min(1, \frac{\epsilon_{\max}}{||\Delta \mathbf{X}||}) $$
+$$ \eta = \eta_0 \cdot \min(1, \frac{\epsilon_{\max}}{||\Delta \mathbf{X}||}) $$
 
 2. **牛顿-拉夫森法**：在雅可比迭代的基础上引入二阶导数信息，可以加速收敛
 
