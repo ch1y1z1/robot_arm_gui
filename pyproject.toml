@@ -1,0 +1,7 @@
+[project]
+name = "robot_arm_gui"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["matplotlib>=3.10.1", "nicegui>=2.13.0", "numpy>=2.2.4"]
