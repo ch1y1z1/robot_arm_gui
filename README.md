@@ -6,16 +6,18 @@
 
 ## 参数定义
 首先定义各参数：
-- $\theta_{A1}$, $\theta_{A2}$, $\theta_{A3}$ 为A1、A2、A3关节角度
-- $\alpha_{A1}$, $\alpha_{A2}$, $\alpha_{A3}$ 为A1、A2、A3关节坐标
-- $X$, $Y$, $Z$ 为末端执行器在世界坐标系中的位置
+- $\theta_{A1}$ , $\theta_{A2}$ , $\theta_{A3}$ 为A1、A2、A3关节角度
+- $\alpha_{A1}$ , $\alpha_{A2}$ , $\alpha_{A3}$ 为A1、A2、A3关节坐标
+- $X$ , $Y$ , $Z$ 为末端执行器在世界坐标系中的位置
 - $L_1, L_2, L_3, L_4, L_5$ 为机械臂连杆参数
 
 ## 正向运动学方程
 
 ### 关节角度到关节坐标的映射
 $$ \alpha_{A1} = \theta_{A1} + \alpha_{A1,start} $$
+
 $$ \alpha_{A2} = \theta_{A2} + \alpha_{A2,start} $$
+
 $$ \alpha_{A3} = \theta_{A3} + \alpha_{A3,start} - \alpha_{A2} $$
 
 ### 关节坐标到笛卡尔坐标(世界坐标)的映射
@@ -25,22 +27,23 @@ $$ Y = ((L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3}
 
 $$ Z = L_1 + L_2 \sin(\alpha_{A2}) + L_3 \sin(\alpha_{A2} + \alpha_{A3}) $$
 
-其中，$L_5$为杆长修正长度，$\alpha_{A1,start}$, $\alpha_{A2,start}$, $\alpha_{A3,start}$为各关节的起始角度偏移。
+其中，$L_5$ 为杆长修正长度，$\alpha_{A1,start}$ , $\alpha_{A2,start}$, $\alpha_{A3,start}$为各关节的起始角度偏移。
 
 
 
 # 机械臂逆运动学方程推导
 
-从已知的正向运动学方程，我将推导出逆运动学方程，即根据末端执行器的笛卡尔坐标$(X, Y, Z)$求解关节角度$(\theta_{A1}, \theta_{A2}, \theta_{A3})$。
+从已知的正向运动学方程，我将推导出逆运动学方程，即根据末端执行器的笛卡尔坐标 $(X, Y, Z)$ 求解关节角度 $(\theta_{A1}, \theta_{A2}, \theta_{A3})$。
 
 ## 推导过程
 
-### 步骤1: 求解$\alpha_{A1}$
-从正向运动学方程中可以看出，$X$和$Y$坐标与$\alpha_{A1}$的关系为：
+### 步骤1: 求解 $\alpha_{A1}$
+从正向运动学方程中可以看出， $X$ 和 $Y$ 坐标与 $\alpha_{A1}$ 的关系为：
 $$ X = r \cdot \cos(\alpha_{A1}) $$
+
 $$ Y = r \cdot \sin(\alpha_{A1}) $$
 
-其中$r = (L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3})$
+其中 $r = (L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3})$
 
 因此：
 $$ \alpha_{A1} = \text{atan2}(Y, X) $$
@@ -48,33 +51,37 @@ $$ \alpha_{A1} = \text{atan2}(Y, X) $$
 ### 步骤2: 计算辅助变量
 定义辅助变量：
 $$ r = \sqrt{X^2 + Y^2} $$
+
 $$ \rho = r - (L_5 + L_4) $$
+
 $$ \zeta = Z - L_1 $$
 
-### 步骤3: 求解$\alpha_{A3}$
+### 步骤3: 求解 $\alpha_{A3}$
 使用余弦定律：
 $$ \rho^2 + \zeta^2 = L_2^2 + L_3^2 + 2L_2L_3\cos(\alpha_{A3}) $$
 
 整理得：
 $$ \cos(\alpha_{A3}) = \frac{\rho^2 + \zeta^2 - L_2^2 - L_3^2}{2L_2L_3} $$
 
-定义$D = \frac{\rho^2 + \zeta^2 - L_2^2 - L_3^2}{2L_2L_3}$，则：
+定义 $D = \frac{\rho^2 + \zeta^2 - L_2^2 - L_3^2}{2L_2L_3}$ ，则：
 $$ \alpha_{A3} = \text{atan2}(\pm\sqrt{1-D^2}, D) $$
 
 其中符号取决于机械臂的构型（肘上或肘下）。
 
-### 步骤4: 求解$\alpha_{A2}$
+### 步骤4: 求解 $\alpha_{A2}$
 $$ \alpha_{A2} = \text{atan2}(\zeta, \rho) - \text{atan2}(L_3\sin(\alpha_{A3}), L_2 + L_3\cos(\alpha_{A3})) $$
 
 ### 步骤5: 计算关节角度
 根据关节角度和关节坐标的关系，最终求得：
 $$ \theta_{A1} = \alpha_{A1} - \alpha_{A1,\text{start}} $$
+
 $$ \theta_{A2} = \alpha_{A2} - \alpha_{A2,\text{start}} $$
+
 $$ \theta_{A3} = \alpha_{A3} - \alpha_{A3,\text{start}} + \alpha_{A2} $$
 
 ## 完整逆运动学方程
 
-给定末端执行器位置$(X, Y, Z)$，关节角度可以通过以下方程求解：
+给定末端执行器位置 $(X, Y, Z)$ ，关节角度可以通过以下方程求解：
 
 1. $\alpha_{A1} = \text{atan2}(Y, X)$
 2. $r = \sqrt{X^2 + Y^2}$
@@ -113,7 +120,7 @@ $$ \Delta \mathbf{\Theta} = \mathbf{J}^{-1} \cdot \Delta \mathbf{X} $$
 
 ## 雅可比矩阵推导
 
-对于我们的三自由度机械臂，由于 $\theta_1$ 只影响 $x$ 和 $y$ 坐标的平面旋转，我们可以先求解 $\theta_1$，然后使用雅可比矩阵方法求解 $\theta_2$ 和 $\theta_3$。
+对于我们的三自由度机械臂，由于 $\theta_1$ 只影响 $x$ 和 $y$ 坐标的平面旋转，我们可以先求解 $\theta_1$ ，然后使用雅可比矩阵方法求解 $\theta_2$ 和 $\theta_3$。
 
 ### $\theta_1$ 的求解
 
@@ -123,14 +130,15 @@ $$ \theta_1 = \alpha_{A1} - \alpha_{A1,\text{start}} = \text{atan2}(y, x) - \alp
 
 ### $\theta_2$ 和 $\theta_3$ 的雅可比矩阵
 
-对于 $\theta_2$ 和 $\theta_3$，我们考虑平面内的 $(r, z)$ 坐标，其中 $r = \sqrt{x^2 + y^2}$。
+对于 $\theta_2$ 和 $\theta_3$ ，我们考虑平面内的 $(r, z)$ 坐标，其中 $r = \sqrt{x^2 + y^2}$ 。
 
 根据正向运动学方程，我们有：
 
 $$ r = (L_5 + L_4) + L_2 \cos(\alpha_{A2}) + L_3 \cos(\alpha_{A2} + \alpha_{A3}) $$
+
 $$ z = L_1 + L_2 \sin(\alpha_{A2}) + L_3 \sin(\alpha_{A2} + \alpha_{A3}) $$
 
-其中 $\alpha_{A2} = \theta_2 + \alpha_{A2,\text{start}}$，$\alpha_{A3} = \theta_3 + \alpha_{A3,\text{start}} - \alpha_{A2}$。
+其中 $\alpha_{A2} = \theta_2 + \alpha_{A2,\text{start}}$ ， $\alpha_{A3} = \theta_3 + \alpha_{A3,\text{start}} - \alpha_{A2}$ 。
 
 计算雅可比矩阵元素：
 
@@ -142,8 +150,8 @@ $$ J_{21} = \frac{\partial z}{\partial \theta_2} = L_2 \cos(\alpha_{A2}) + L_3 \
 
 $$ J_{22} = \frac{\partial z}{\partial \theta_3} = L_3 \cos(\alpha_{A2} + \alpha_{A3}) \cdot \frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_3} $$
 
-考虑到 $\frac{\partial \alpha_{A2}}{\partial \theta_2} = 1$，$\frac{\partial \alpha_{A3}}{\partial \theta_2} = -1$，$\frac{\partial \alpha_{A3}}{\partial \theta_3} = 1$，
-以及 $\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_2} = 0$，$\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_3} = 1$，
+考虑到 $\frac{\partial \alpha_{A2}}{\partial \theta_2} = 1$，$\frac{\partial \alpha_{A3}}{\partial \theta_2} = -1$ ， $\frac{\partial \alpha_{A3}}{\partial \theta_3} = 1$ ，
+以及 $\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_2} = 0$ ， $\frac{\partial (\alpha_{A2} + \alpha_{A3})}{\partial \theta_3} = 1$ ，
 
 简化后得到：
 
@@ -157,7 +165,7 @@ $$ J_{22} = L_3 \cos(\alpha_{A2} + \alpha_{A3}) \cdot 1 = L_3 \cos(\alpha_{A2} +
 
 因此，雅可比矩阵为：
 
-$$ \mathbf{J} = \begin{bmatrix} 
+$$ \mathbf{J} = \begin{bmatrix}
 -L_2 \sin(\alpha_{A2}) & -L_3 \sin(\alpha_{A2} + \alpha_{A3}) \\
 L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
 \end{bmatrix} $$
@@ -173,7 +181,7 @@ L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
    b. 计算位置误差 $\Delta r = r_{\text{target}} - r_{\text{current}}$, $\Delta z = z_{\text{target}} - z_{\text{current}}$
    c. 计算当前关节角度下的雅可比矩阵 $\mathbf{J}$
    d. 求解关节角度增量 $\Delta \mathbf{\Theta} = \mathbf{J}^{-1} \cdot \Delta \mathbf{X}$
-   e. 更新关节角度 $\theta_2 = \theta_2 + \eta \cdot \Delta \theta_2$, $\theta_3 = \theta_3 + \eta \cdot \Delta \theta_3$，其中 $\eta$ 为学习率
+   e. 更新关节角度 $\theta_2 = \theta_2 + \eta \cdot \Delta \theta_2$ ,  $\theta_3 = \theta_3 + \eta \cdot \Delta \theta_3$ ， 其中 $\eta$ 为学习率
 
 ### 算法实现细节
 
@@ -264,7 +272,7 @@ L_2 \cos(\alpha_{A2}) & L_3 \cos(\alpha_{A2} + \alpha_{A3})
 
 4. **阻尼最小二乘法**：为进一步提高稳定性，可以考虑使用阻尼最小二乘法（Damped Least Squares）：
    $$ \Delta \mathbf{\Theta} = \mathbf{J}^T(\mathbf{J}\mathbf{J}^T + \lambda \mathbf{I})^{-1}\Delta \mathbf{X} $$
-   其中 $\lambda$ 为阻尼因子，$\mathbf{I}$ 为单位矩阵。
+   其中 $\lambda$ 为阻尼因子， $\mathbf{I}$ 为单位矩阵。
 
 ## 优化策略
 
